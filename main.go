@@ -24,7 +24,7 @@ func handler(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	page := Page{
-		Title: "Hello, Go Web!",
+		Title: "PSV to XML converter",
 	}
 
 	// Parse the HTML template file

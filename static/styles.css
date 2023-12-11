@@ -1,11 +1,14 @@
-/* styles.css */
-
 body {
     background-color: #424242;
+    color: rgb(209, 208, 208);;
     font-family: Arial, sans-serif;
     margin: 20px;
 }
 
-h1 {
+h1, h2 {
     color: #BDB76B;
+}
+
+input[type=submit] {
+    color: black;
 }

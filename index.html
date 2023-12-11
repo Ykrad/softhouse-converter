@@ -7,5 +7,14 @@
 	<body>
 		<h1>{{.Title}}</h1>
 		<p>Welcome to the Go Web Page!</p>
+		<h1>File Upload</h1>
+		<form method="post" action="/" enctype="multipart/form-data">
+			<input type="file" name="file" />
+			<input type="submit" value="Upload" />
+		</form>
+		{{ if .UploadedFileContent }}
+			<h2>File Content:</h2>
+			<pre>{{ html .UploadedFileContent }}</pre>
+		{{ end }}
 	</body>
 	</html>

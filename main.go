@@ -91,7 +91,7 @@ func main() {
 	flag.Parse()
 
 	if *https {
-		fmt.Printf("Starting the server in https mode. Go to https://localhost:%d", port)
+		fmt.Printf("Starting the server in https mode. Go to https://localhost:%d\n", port)
 
 		// Specify paths to TLS certificate and private key files
 		certFile := "./security/cert.pem"
@@ -103,7 +103,7 @@ func main() {
 			fmt.Println("Error starting the server:", error)
 		}
 	} else {
-		fmt.Printf("Starting the server in http mode. Go to http://localhost:%d", port)
+		fmt.Printf("Starting the server in http mode. Go to http://localhost:%d\n", port)
 
 		// Start the web server and listen on the specified port
 		error := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)

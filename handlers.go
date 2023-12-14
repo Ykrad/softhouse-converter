@@ -11,6 +11,7 @@ import (
 type Page struct {
 	Title               string
 	UploadedFileContent string
+	DarkModeOff         bool
 }
 
 // Handles path "/"
@@ -30,6 +31,7 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 	page := Page{
 		Title:               "PSV to XML converter",
 		UploadedFileContent: "",
+		DarkModeOff:         darkModeOff,
 	}
 
 	if request.Method == http.MethodPost {

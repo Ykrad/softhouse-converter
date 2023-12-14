@@ -19,9 +19,12 @@ func main() {
 
 	// Define command line arguments
 	https := flag.Bool("https", false, "Sets the webserver in https only mode")
+	darkMode := flag.Bool("dark-mode-off", false, "Sets css styling to normal non darkmode")
 
 	// Parse command line arguments
 	flag.Parse()
+
+	darkModeOff = *darkMode
 
 	if *https {
 		fmt.Printf("Starting the server in https mode. Go to https://localhost:%d\n", port)

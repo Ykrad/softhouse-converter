@@ -23,7 +23,7 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	if request.Method != "GET" && request.Method != "POST" {
-		http.Error(writer, "Method is not supported.", http.StatusNotFound)
+		http.Error(writer, "Method is not supported.", http.StatusMethodNotAllowed)
 		return
 	}
 

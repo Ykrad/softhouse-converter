@@ -13,10 +13,6 @@ func main() {
 	// Register the handler function for a specific route
 	http.HandleFunc("/", indexHandler)
 
-	// Set the port for the server to listen on
-	port := 8080
-	fmt.Printf("Server is listening on port %d...\n", port)
-
 	// Define command line arguments
 	https := flag.Bool("https", false, "Sets the webserver in https only mode")
 	darkMode := flag.Bool("dark-mode-off", false, "Sets css styling to normal non darkmode")
@@ -25,6 +21,10 @@ func main() {
 	flag.Parse()
 
 	darkModeOff = *darkMode
+
+	// Set the port for the server to listen on
+	port := 8080
+	fmt.Printf("Server is listening on port %d...\n", port)
 
 	if *https {
 		fmt.Printf("Starting the server in https mode. Go to https://localhost:%d\n", port)

@@ -36,15 +36,15 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 
 	if request.Method == http.MethodPost {
 		// Parse the form data
-		err := request.ParseMultipartForm(10 << 20) // 10 MB limit
-		if err != nil {
+		error := request.ParseMultipartForm(10 << 20) // 10 MB limit
+		if error != nil {
 			http.Error(writer, "Unable to parse form", http.StatusBadRequest)
 			return
 		}
 
 		// Get the file from the form
-		file, handler, err := request.FormFile("file")
-		if err != nil {
+		file, handler, error := request.FormFile("file")
+		if error != nil {
 			http.Error(writer, "Unable to get file", http.StatusBadRequest)
 			return
 		}
@@ -53,8 +53,8 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 		fmt.Println("Received file: ", handler.Filename)
 
 		// Read the content of the uploaded file
-		content, err := io.ReadAll(file)
-		if err != nil {
+		content, error := io.ReadAll(file)
+		if error != nil {
 			http.Error(writer, "Unable to read file content", http.StatusInternalServerError)
 			return
 		}

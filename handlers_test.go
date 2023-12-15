@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
 
@@ -53,5 +54,36 @@ func TestIndexHandlerMethodNotAllowed(t *testing.T) {
 	// Check the response status code
 	if status := responseRecorder.Code; status != http.StatusMethodNotAllowed {
 		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusMethodNotAllowed)
+	}
+}
+
+func TestThatConvertToXML(t *testing.T) {
+	// Given
+	testdata, error := os.Open("testdata/pvs")
+	if error != nil {
+		t.Errorf("Failed to read test data")
+	}
+	expected := "<person>" +
+		"<firstname>Carl Gustaf</firstname>" +
+		"<lastname>Bernadotte</lastname>" +
+		"<phone>" +
+		"<mobile>0768-101801</mobile>" +
+		"<landline>08-101801</landline>" +
+		"</phone>" +
+		"<address>" +
+		"<street>Drottningholms slott</street>" +
+		"<city>Stockholm</city>" +
+		"</address>" +
+		"</person>"
+
+	// When
+	xml, error := convertToXml(testdata)
+	if error != nil {
+		t.Errorf("Failed to convert")
+	}
+
+	// Then
+	if xml != expected {
+		t.Errorf("Did not return correct string: \nExpected: %s\nBut was:%s", expected, xml)
 	}
 }

@@ -1,10 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"html/template"
 	"io"
+	"mime/multipart"
 	"net/http"
+	"strings"
 )
 
 // Page is a struct to represent the data that will be rendered in the HTML template
@@ -74,5 +77,86 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 	error = indexTemplate.Execute(writer, page)
 	if error != nil {
 		http.Error(writer, error.Error(), http.StatusInternalServerError)
+	}
+}
+
+type Phone struct {
+	mobile   string
+	landline string
+}
+
+func (phone Phone) toXML() string {
+	return fmt.Sprintf("<phone><mobile>%s</mobile><landline>%s</landline></phone>",
+		phone.mobile, phone.landline)
+}
+
+type Address struct {
+	street   string
+	city     string
+	areaCode string
+}
+
+func (address Address) toXML() string {
+	return fmt.Sprintf("<address><street>%s</street><city>%s</city><areaCode>%s</areaCode></address>",
+		address.street, address.city, address.areaCode)
+}
+
+type Person struct {
+	firstName string
+	lastName  string
+	phone     Phone
+	address   Address
+}
+
+func (person Person) toXML() string {
+	return fmt.Sprintf("<person><firstname>%s</firstname><lastname>%s</lastname>%s%s</person>",
+		person.firstName, person.lastName, person.phone.toXML(), person.address.toXML())
+}
+
+func convertToXml(file multipart.File) (string, error) {
+	// Create a Scanner to read the file line by line
+	scanner := bufio.NewScanner(file)
+	person := Person{}
+
+	// Process each line
+	for scanner.Scan() {
+		splitLine := strings.Split(scanner.Text(), "|")
+
+		if splitLine[0] == "P" {
+			person = Person{
+				firstName: splitLine[1],
+				lastName:  splitLine[2],
+			}
+
+			// Get the lines related to this person
+			for i := 0; i < 2; i++ {
+				if !scanner.Scan() {
+					break
+				}
+				splitLine = strings.Split(scanner.Text(), "|")
+				parseSubLine(&person, splitLine)
+			}
+		}
+	}
+
+	if error := scanner.Err(); error != nil {
+		return "", error
+	}
+
+	return person.toXML(), nil
+}
+
+func parseSubLine(person *Person, splitLine []string) {
+	if splitLine[0] == "T" {
+		person.phone = Phone{
+			mobile:   splitLine[1],
+			landline: splitLine[2],
+		}
+	} else if splitLine[0] == "A" {
+		person.address = Address{
+			street:   splitLine[1],
+			city:     splitLine[2],
+			areaCode: splitLine[3],
+		}
 	}
 }

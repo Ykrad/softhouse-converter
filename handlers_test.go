@@ -63,7 +63,8 @@ func TestConvertToXMLForPersonWithAddressAndPhone(t *testing.T) {
 	if error != nil {
 		t.Errorf("Failed to read test data")
 	}
-	expected := "<person>" +
+	expected := "<people>" +
+		"<person>" +
 		"<firstname>Carl Gustaf</firstname>" +
 		"<lastname>Bernadotte</lastname>" +
 		"<phone>" +
@@ -75,7 +76,8 @@ func TestConvertToXMLForPersonWithAddressAndPhone(t *testing.T) {
 		"<city>Stockholm</city>" +
 		"<areaCode>10001</areaCode>" +
 		"</address>" +
-		"</person>"
+		"</person>" +
+		"</people>"
 
 	// When
 	xml, error := convertToXml(testdata)
@@ -95,14 +97,16 @@ func TestConvertToXMLWorksForPersonWithoutAddress(t *testing.T) {
 	if error != nil {
 		t.Errorf("Failed to read test data")
 	}
-	expected := "<person>" +
+	expected := "<people>" +
+		"<person>" +
 		"<firstname>Carl Gustaf</firstname>" +
 		"<lastname>Bernadotte</lastname>" +
 		"<phone>" +
 		"<mobile>0768-101801</mobile>" +
 		"<landline>08-101801</landline>" +
 		"</phone>" +
-		"</person>"
+		"</person>" +
+		"</people>"
 
 	// When
 	xml, error := convertToXml(testdata)
@@ -122,7 +126,8 @@ func TestConvertToXMLWorksForPersonWithoutPhone(t *testing.T) {
 	if error != nil {
 		t.Errorf("Failed to read test data")
 	}
-	expected := "<person>" +
+	expected := "<people>" +
+		"<person>" +
 		"<firstname>Carl Gustaf</firstname>" +
 		"<lastname>Bernadotte</lastname>" +
 		"<address>" +
@@ -130,7 +135,8 @@ func TestConvertToXMLWorksForPersonWithoutPhone(t *testing.T) {
 		"<city>Stockholm</city>" +
 		"<areaCode>10001</areaCode>" +
 		"</address>" +
-		"</person>"
+		"</person>" +
+		"</people>"
 
 	// When
 	xml, error := convertToXml(testdata)
@@ -150,14 +156,58 @@ func TestConvertToXMLWorksForPersonWithAddressWithoutAreaCode(t *testing.T) {
 	if error != nil {
 		t.Errorf("Failed to read test data")
 	}
-	expected := "<person>" +
+	expected := "<people>" +
+		"<person>" +
 		"<firstname>Barack</firstname>" +
 		"<lastname>Obama</lastname>" +
 		"<address>" +
 		"<street>1600 Pennsylvania Avenue</street>" +
 		"<city>Washington, D.C</city>" +
 		"</address>" +
-		"</person>"
+		"</person>" +
+		"</people>"
+
+	// When
+	xml, error := convertToXml(testdata)
+	if error != nil {
+		t.Errorf("Failed to convert")
+	}
+
+	// Then
+	if xml != expected {
+		t.Errorf("Did not return correct string: \nExpected: %s\nBut was:%s", expected, xml)
+	}
+}
+
+func TestConvertToXMLWorksForTwoPersons(t *testing.T) {
+	// Given
+	testdata, error := os.Open("testdata/twopersons")
+	if error != nil {
+		t.Errorf("Failed to read test data")
+	}
+	expected := "<people>" +
+		"<person>" +
+		"<firstname>Carl Gustaf</firstname>" +
+		"<lastname>Bernadotte</lastname>" +
+		"<phone>" +
+		"<mobile>0768-101801</mobile>" +
+		"<landline>08-101801</landline>" +
+		"</phone>" +
+		"<address>" +
+		"<street>Drottningholms slott</street>" +
+		"<city>Stockholm</city>" +
+		"<areaCode>10001</areaCode>" +
+		"</address>" +
+		"</person>" +
+		"<person>" +
+		"<firstname>Barack</firstname>" +
+		"<lastname>Obama</lastname>" +
+		"<address>" +
+		"<street>1600 Pennsylvania Avenue</street>" +
+		"<city>Washington, D.C</city>" +
+		"</address>" +
+		"</person>" +
+		"</people>"
 
 	// When
 	xml, error := convertToXml(testdata)

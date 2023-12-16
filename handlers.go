@@ -83,26 +83,20 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 func convertToXml(file multipart.File) (string, error) {
 	// Create a Scanner to read the file line by line
 	scanner := bufio.NewScanner(file)
-	person := Person{}
+	people := []Person{}
 
-	// Process each line
+	// Get all lines
+	lines := [][]string{}
 	for scanner.Scan() {
 		splitLine := strings.Split(scanner.Text(), "|")
+		lines = append(lines, splitLine)
+	}
 
-		if splitLine[0] == "P" {
-			person = Person{
-				firstName: splitLine[1],
-				lastName:  splitLine[2],
-			}
-
-			// Get the lines related to this person
-			for i := 0; i < 2; i++ {
-				if !scanner.Scan() {
-					break
-				}
-				splitLine = strings.Split(scanner.Text(), "|")
-				parseSubLine(&person, splitLine)
-			}
+	// Parse all lines
+	for i := 0; i < len(lines); i++ {
+		if lines[i][0] == "P" {
+			personLines := getPersonLines(i, lines)
+			people = append(people, parsePerson(personLines))
 		}
 	}
 
@@ -110,26 +104,54 @@ func convertToXml(file multipart.File) (string, error) {
 		return "", error
 	}
 
-	return person.toXML(), nil
+	personsXML := ""
+	for _, person := range people {
+		personsXML += person.toXML()
+	}
+
+	return fmt.Sprintf("<people>%s</people>", personsXML), nil
 }
 
-func parseSubLine(person *Person, splitLine []string) {
-	if splitLine[0] == "T" {
-		person.phone = Phone{
-			mobile:   splitLine[1],
-			landline: splitLine[2],
-		}
-		person.phoneInitialized = true
-	} else if splitLine[0] == "A" {
-		person.address = Address{
-			street: splitLine[1],
-			city:   splitLine[2],
-		}
+func getPersonLines(index int, lines [][]string) [][]string {
+	personLines := [][]string{}
+	for i := index; i < len(lines); i++ {
+		personLines = append(personLines, lines[i])
 
-		if len(splitLine) == 4 {
-			person.address.areaCode = splitLine[3]
+		if i+1 != len(lines) && lines[i+1][0] == "P" {
+			break
 		}
-
-		person.addressInitialized = true
 	}
+
+	return personLines
+}
+
+func parsePerson(splitLines [][]string) Person {
+	person := Person{}
+	for _, splitLine := range splitLines {
+		if splitLine[0] == "P" {
+			person.firstName = splitLine[1]
+			person.lastName = splitLine[2]
+		} else if splitLine[0] == "T" {
+			phone := Phone{
+				mobile:   splitLine[1],
+				landline: splitLine[2],
+			}
+			person.phone = phone
+			person.phoneInitialized = true
+		} else if splitLine[0] == "A" {
+			address := Address{
+				street: splitLine[1],
+				city:   splitLine[2],
+			}
+
+			if len(splitLine) == 4 {
+				address.areaCode = splitLine[3]
+			}
+
+			person.address = address
+			person.addressInitialized = true
+		}
+	}
+
+	return person
 }

@@ -57,9 +57,9 @@ func TestIndexHandlerMethodNotAllowed(t *testing.T) {
 	}
 }
 
-func TestThatConvertToXML(t *testing.T) {
+func TestConvertToXMLForPersonWithAddressAndPhone(t *testing.T) {
 	// Given
-	testdata, error := os.Open("testdata/pvs")
+	testdata, error := os.Open("testdata/personwithaddressandphone")
 	if error != nil {
 		t.Errorf("Failed to read test data")
 	}
@@ -70,6 +70,61 @@ func TestThatConvertToXML(t *testing.T) {
 		"<mobile>0768-101801</mobile>" +
 		"<landline>08-101801</landline>" +
 		"</phone>" +
+		"<address>" +
+		"<street>Drottningholms slott</street>" +
+		"<city>Stockholm</city>" +
+		"<areaCode>10001</areaCode>" +
+		"</address>" +
+		"</person>"
+
+	// When
+	xml, error := convertToXml(testdata)
+	if error != nil {
+		t.Errorf("Failed to convert")
+	}
+
+	// Then
+	if xml != expected {
+		t.Errorf("Did not return correct string: \nExpected: %s\nBut was:%s", expected, xml)
+	}
+}
+
+func TestConvertToXMLWorksForPersonWithoutAddress(t *testing.T) {
+	// Given
+	testdata, error := os.Open("testdata/personwithoutaddress")
+	if error != nil {
+		t.Errorf("Failed to read test data")
+	}
+	expected := "<person>" +
+		"<firstname>Carl Gustaf</firstname>" +
+		"<lastname>Bernadotte</lastname>" +
+		"<phone>" +
+		"<mobile>0768-101801</mobile>" +
+		"<landline>08-101801</landline>" +
+		"</phone>" +
+		"</person>"
+
+	// When
+	xml, error := convertToXml(testdata)
+	if error != nil {
+		t.Errorf("Failed to convert")
+	}
+
+	// Then
+	if xml != expected {
+		t.Errorf("Did not return correct string: \nExpected: %s\nBut was:%s", expected, xml)
+	}
+}
+
+func TestConvertToXMLWorksForPersonWithoutPhone(t *testing.T) {
+	// Given
+	testdata, error := os.Open("testdata/personwithoutphone")
+	if error != nil {
+		t.Errorf("Failed to read test data")
+	}
+	expected := "<person>" +
+		"<firstname>Carl Gustaf</firstname>" +
+		"<lastname>Bernadotte</lastname>" +
 		"<address>" +
 		"<street>Drottningholms slott</street>" +
 		"<city>Stockholm</city>" +

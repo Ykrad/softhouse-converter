@@ -87,7 +87,7 @@ func TestConvertToXMLForPersonWithAddressAndPhone(t *testing.T) {
 
 	// Then
 	if xml != expected {
-		t.Errorf("Did not return correct string: \nExpected: %s\nBut was:%s", expected, xml)
+		t.Errorf("Did not return correct string: \nExpected: %s\nBut was:  %s", expected, xml)
 	}
 }
 
@@ -116,7 +116,7 @@ func TestConvertToXMLWorksForPersonWithoutAddress(t *testing.T) {
 
 	// Then
 	if xml != expected {
-		t.Errorf("Did not return correct string: \nExpected: %s\nBut was:%s", expected, xml)
+		t.Errorf("Did not return correct string: \nExpected: %s\nBut was:  %s", expected, xml)
 	}
 }
 
@@ -146,7 +146,7 @@ func TestConvertToXMLWorksForPersonWithoutPhone(t *testing.T) {
 
 	// Then
 	if xml != expected {
-		t.Errorf("Did not return correct string: \nExpected: %s\nBut was:%s", expected, xml)
+		t.Errorf("Did not return correct string: \nExpected: %s\nBut was:  %s", expected, xml)
 	}
 }
 
@@ -175,7 +175,7 @@ func TestConvertToXMLWorksForPersonWithAddressWithoutAreaCode(t *testing.T) {
 
 	// Then
 	if xml != expected {
-		t.Errorf("Did not return correct string: \nExpected: %s\nBut was:%s", expected, xml)
+		t.Errorf("Did not return correct string: \nExpected: %s\nBut was:  %s", expected, xml)
 	}
 }
 
@@ -217,6 +217,6 @@ func TestConvertToXMLWorksForTwoPersons(t *testing.T) {
 
 	// Then
 	if xml != expected {
-		t.Errorf("Did not return correct string: \nExpected: %s\nBut was:%s", expected, xml)
+		t.Errorf("Did not return correct string: \nExpected: %s\nBut was:  %s", expected, xml)
 	}
 }

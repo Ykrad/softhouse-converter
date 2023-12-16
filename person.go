@@ -19,8 +19,13 @@ type Address struct {
 }
 
 func (address Address) toXML() string {
-	return fmt.Sprintf("<address><street>%s</street><city>%s</city><areaCode>%s</areaCode></address>",
-		address.street, address.city, address.areaCode)
+	areaCode := ""
+	if address.areaCode != "" {
+		areaCode = fmt.Sprintf("<areaCode>%s</areaCode>", address.areaCode)
+	}
+
+	return fmt.Sprintf("<address><street>%s</street><city>%s</city>%s</address>",
+		address.street, address.city, areaCode)
 }
 
 type Person struct {

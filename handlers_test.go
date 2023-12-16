@@ -143,3 +143,30 @@ func TestConvertToXMLWorksForPersonWithoutPhone(t *testing.T) {
 		t.Errorf("Did not return correct string: \nExpected: %s\nBut was:%s", expected, xml)
 	}
 }
+
+func TestConvertToXMLWorksForPersonWithAddressWithoutAreaCode(t *testing.T) {
+	// Given
+	testdata, error := os.Open("testdata/personwithaddresswithoutareacode")
+	if error != nil {
+		t.Errorf("Failed to read test data")
+	}
+	expected := "<person>" +
+		"<firstname>Barack</firstname>" +
+		"<lastname>Obama</lastname>" +
+		"<address>" +
+		"<street>1600 Pennsylvania Avenue</street>" +
+		"<city>Washington, D.C</city>" +
+		"</address>" +
+		"</person>"
+
+	// When
+	xml, error := convertToXml(testdata)
+	if error != nil {
+		t.Errorf("Failed to convert")
+	}
+
+	// Then
+	if xml != expected {
+		t.Errorf("Did not return correct string: \nExpected: %s\nBut was:%s", expected, xml)
+	}
+}

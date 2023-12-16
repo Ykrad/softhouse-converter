@@ -122,10 +122,14 @@ func parseSubLine(person *Person, splitLine []string) {
 		person.phoneInitialized = true
 	} else if splitLine[0] == "A" {
 		person.address = Address{
-			street:   splitLine[1],
-			city:     splitLine[2],
-			areaCode: splitLine[3],
+			street: splitLine[1],
+			city:   splitLine[2],
 		}
+
+		if len(splitLine) == 4 {
+			person.address.areaCode = splitLine[3]
+		}
+
 		person.addressInitialized = true
 	}
 }

@@ -18,5 +18,9 @@
 			<h2>File Content:</h2>
 			<pre>{{ html .UploadedFileContent }}</pre>
 		{{ end }}
+		{{ if .FileContentInXML }}
+			<h2>In XML:</h2>
+			<pre>{{ html .FileContentInXML }}</pre>
+		{{ end }}
 	</body>
 	</html>

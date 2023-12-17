@@ -2,11 +2,11 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/xml"
 	"fmt"
 	"html/template"
 	"io"
-	"mime/multipart"
 	"net/http"
 	"strings"
 )
@@ -15,6 +15,7 @@ import (
 type Page struct {
 	Title               string
 	UploadedFileContent string
+	FileContentInXML    string
 	DarkModeOff         bool
 }
 
@@ -35,6 +36,7 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 	page := Page{
 		Title:               "PSV to XML converter",
 		UploadedFileContent: "",
+		FileContentInXML:    "",
 		DarkModeOff:         darkModeOff,
 	}
 
@@ -65,6 +67,11 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 
 		// Add content to page template data
 		page.UploadedFileContent = string(content)
+		page.FileContentInXML, error = convertToXml(bytes.NewReader(content))
+		if error != nil {
+			http.Error(writer, "Unable to convert file content to XML", http.StatusInternalServerError)
+			return
+		}
 	}
 
 	// Parse the HTML template file
@@ -86,9 +93,9 @@ type People struct {
 	People  []Person `xml:"person"`
 }
 
-func convertToXml(file multipart.File) (string, error) {
+func convertToXml(reader io.Reader) (string, error) {
 	// Create a Scanner to read the file line by line
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(reader)
 	people := People{
 		People: []Person{},
 	}

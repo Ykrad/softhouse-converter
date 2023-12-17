@@ -221,7 +221,7 @@ func TestConvertToXMLWorksForTwoPersons(t *testing.T) {
 	}
 }
 
-func TestConvertToXMLForPersonWitFamily(t *testing.T) {
+func TestConvertToXMLForPersonWithFamily(t *testing.T) {
 	// Given
 	testdata, error := os.Open("testdata/personwithfamily")
 	if error != nil {

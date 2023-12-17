@@ -95,7 +95,7 @@ func convertToXml(file multipart.File) (string, error) {
 	// Parse all lines
 	for i := 0; i < len(lines); i++ {
 		if lines[i][0] == "P" {
-			personLines := getPersonLines(i, lines)
+			personLines, _ := getUnitLines(i, lines, personValidation)
 			people = append(people, parsePerson(personLines))
 		}
 	}
@@ -112,22 +112,25 @@ func convertToXml(file multipart.File) (string, error) {
 	return fmt.Sprintf("<people>%s</people>", personsXML), nil
 }
 
-func getPersonLines(index int, lines [][]string) [][]string {
-	personLines := [][]string{}
+func getUnitLines(index int, lines [][]string, validation func(string) bool) ([][]string, int) {
+	unitLines := [][]string{}
+	stoppedAtIndex := len(lines)
 	for i := index; i < len(lines); i++ {
-		personLines = append(personLines, lines[i])
+		unitLines = append(unitLines, lines[i])
 
-		if i+1 != len(lines) && lines[i+1][0] == "P" {
+		if i+1 != len(lines) && validation(lines[i+1][0]) {
+			stoppedAtIndex = i
 			break
 		}
 	}
 
-	return personLines
+	return unitLines, stoppedAtIndex
 }
 
 func parsePerson(splitLines [][]string) Person {
 	person := Person{}
-	for _, splitLine := range splitLines {
+	for i := 0; i < len(splitLines); i++ {
+		splitLine := splitLines[i]
 		if splitLine[0] == "P" {
 			person.firstName = splitLine[1]
 			person.lastName = splitLine[2]
@@ -150,8 +153,51 @@ func parsePerson(splitLines [][]string) Person {
 
 			person.address = address
 			person.addressInitialized = true
+		} else if splitLine[0] == "F" {
+			familyLines, stoppedAtIndex := getUnitLines(i, splitLines, familyValidation)
+			person.family = append(person.family, parseFamily(familyLines))
+			i = stoppedAtIndex
 		}
 	}
 
 	return person
+}
+
+func parseFamily(splitLines [][]string) Family {
+	family := Family{}
+
+	for _, splitLine := range splitLines {
+		if splitLine[0] == "F" {
+			family.name = splitLine[1]
+			family.birthyear = splitLine[2]
+		} else if splitLine[0] == "T" {
+			phone := Phone{
+				mobile:   splitLine[1],
+				landline: splitLine[2],
+			}
+			family.phone = phone
+			family.phoneInitialized = true
+		} else if splitLine[0] == "A" {
+			address := Address{
+				street: splitLine[1],
+				city:   splitLine[2],
+			}
+
+			if len(splitLine) == 4 {
+				address.areaCode = splitLine[3]
+			}
+
+			family.address = address
+			family.addressInitialized = true
+		}
+	}
+	return family
+}
+
+func personValidation(identifier string) bool {
+	return identifier == "P"
+}
+
+func familyValidation(identifier string) bool {
+	return identifier == "F" || identifier == "P"
 }

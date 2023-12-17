@@ -28,6 +28,30 @@ func (address Address) toXML() string {
 		address.street, address.city, areaCode)
 }
 
+type Family struct {
+	name               string
+	birthyear          string
+	phone              Phone
+	phoneInitialized   bool
+	address            Address
+	addressInitialized bool
+}
+
+func (family Family) toXML() string {
+	address := ""
+	if family.addressInitialized {
+		address = family.address.toXML()
+	}
+
+	phone := ""
+	if family.phoneInitialized {
+		phone = family.phone.toXML()
+	}
+
+	return fmt.Sprintf("<family><name>%s</name><born>%s</born>%s%s</family>",
+		family.name, family.birthyear, address, phone)
+}
+
 type Person struct {
 	firstName          string
 	lastName           string
@@ -35,6 +59,7 @@ type Person struct {
 	phoneInitialized   bool
 	address            Address
 	addressInitialized bool
+	family             []Family
 }
 
 func (person Person) toXML() string {
@@ -48,6 +73,11 @@ func (person Person) toXML() string {
 		address = person.address.toXML()
 	}
 
-	return fmt.Sprintf("<person><firstname>%s</firstname><lastname>%s</lastname>%s%s</person>",
-		person.firstName, person.lastName, phone, address)
+	family := ""
+	for _, familyMember := range person.family {
+		family += familyMember.toXML()
+	}
+
+	return fmt.Sprintf("<person><firstname>%s</firstname><lastname>%s</lastname>%s%s%s</person>",
+		person.firstName, person.lastName, phone, address, family)
 }

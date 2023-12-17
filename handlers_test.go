@@ -220,3 +220,54 @@ func TestConvertToXMLWorksForTwoPersons(t *testing.T) {
 		t.Errorf("Did not return correct string: \nExpected: %s\nBut was:  %s", expected, xml)
 	}
 }
+
+func TestConvertToXMLForPersonWitFamily(t *testing.T) {
+	// Given
+	testdata, error := os.Open("testdata/personwithfamily")
+	if error != nil {
+		t.Errorf("Failed to read test data")
+	}
+	expected := "<people>" +
+		"<person>" +
+		"<firstname>Carl Gustaf</firstname>" +
+		"<lastname>Bernadotte</lastname>" +
+		"<phone>" +
+		"<mobile>0768-101801</mobile>" +
+		"<landline>08-101801</landline>" +
+		"</phone>" +
+		"<address>" +
+		"<street>Drottningholms slott</street>" +
+		"<city>Stockholm</city>" +
+		"<areaCode>10001</areaCode>" +
+		"</address>" +
+		"<family>" +
+		"<name>Victoria</name>" +
+		"<born>1977</born>" +
+		"<address>" +
+		"<street>Haga Slott</street>" +
+		"<city>Stockholm</city>" +
+		"<areaCode>10002</areaCode>" +
+		"</address>" +
+		"</family>" +
+		"<family>" +
+		"<name>Carl Philip</name>" +
+		"<born>1979</born>" +
+		"<phone>" +
+		"<mobile>0768-101802</mobile>" +
+		"<landline>08-101802</landline>" +
+		"</phone>" +
+		"</family>" +
+		"</person>" +
+		"</people>"
+
+	// When
+	xml, error := convertToXml(testdata)
+	if error != nil {
+		t.Errorf("Failed to convert")
+	}
+
+	// Then
+	if xml != expected {
+		t.Errorf("Did not return correct string: \nExpected: %s\nBut was:  %s", expected, xml)
+	}
+}

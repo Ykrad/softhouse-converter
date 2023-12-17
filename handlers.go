@@ -19,6 +19,17 @@ type Page struct {
 	DarkModeOff         bool
 }
 
+// Handles path "/download"
+func downloadHandler(writer http.ResponseWriter, request *http.Request) {
+	// Set the Content-Disposition header to trigger a download prompt
+	writer.Header().Set("Content-Disposition", "attachment; filename=converted.xml")
+	// Set the Content-Type header to indicate the file type (text/plain in this case)
+	writer.Header().Set("Content-Type", "text/plain")
+
+	// Write the text content to the response writer
+	io.WriteString(writer, currentXML)
+}
+
 // Handles path "/"
 func indexHandler(writer http.ResponseWriter, request *http.Request) {
 	// Validate
@@ -72,6 +83,8 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 			http.Error(writer, "Unable to convert file content to XML", http.StatusInternalServerError)
 			return
 		}
+
+		currentXML = page.FileContentInXML
 	}
 
 	// Parse the HTML template file

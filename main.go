@@ -12,6 +12,7 @@ func main() {
 
 	// Register the handler function for a specific route
 	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/download", downloadHandler)
 
 	// Define command line arguments
 	https := flag.Bool("https", false, "Sets the webserver in https only mode")

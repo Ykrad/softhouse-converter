@@ -17,3 +17,16 @@ func (address Address) toXML() string {
 	return fmt.Sprintf("<address><street>%s</street><city>%s</city>%s</address>",
 		address.street, address.city, areaCode)
 }
+
+func parseAddress(splitLine []string) Address {
+	address := Address{
+		street: splitLine[1],
+		city:   splitLine[2],
+	}
+
+	if len(splitLine) == 4 {
+		address.areaCode = splitLine[3]
+	}
+
+	return address
+}

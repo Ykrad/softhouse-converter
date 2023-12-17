@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/xml"
 	"fmt"
 	"html/template"
 	"io"
@@ -80,10 +81,17 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+type People struct {
+	XMLName xml.Name `xml:"people"`
+	People  []Person `xml:"person"`
+}
+
 func convertToXml(file multipart.File) (string, error) {
 	// Create a Scanner to read the file line by line
 	scanner := bufio.NewScanner(file)
-	people := []Person{}
+	people := People{
+		People: []Person{},
+	}
 
 	// Get all lines
 	lines := [][]string{}
@@ -96,7 +104,7 @@ func convertToXml(file multipart.File) (string, error) {
 	for i := 0; i < len(lines); i++ {
 		if lines[i][0] == "P" {
 			personLines, _ := getUnitLines(i, lines, personValidation)
-			people = append(people, parsePerson(personLines))
+			people.People = append(people.People, parsePerson(personLines))
 		}
 	}
 
@@ -104,12 +112,8 @@ func convertToXml(file multipart.File) (string, error) {
 		return "", error
 	}
 
-	personsXML := ""
-	for _, person := range people {
-		personsXML += person.toXML()
-	}
-
-	return fmt.Sprintf("<people>%s</people>", personsXML), nil
+	xmlBytes, _ := xml.MarshalIndent(people, "", "    ")
+	return string(xmlBytes), nil
 }
 
 func getUnitLines(index int, lines [][]string, validation func(string) bool) ([][]string, int) {

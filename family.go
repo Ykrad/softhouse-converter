@@ -1,29 +1,53 @@
 package main
 
-import "fmt"
+import (
+	"encoding/xml"
+)
 
 type Family struct {
-	name               string
-	birthyear          string
-	phone              Phone
+	Name               string
+	Birthyear          string
+	Phone              Phone
 	phoneInitialized   bool
-	address            Address
+	Address            Address
 	addressInitialized bool
 }
 
-func (family Family) toXML() string {
-	address := ""
-	if family.addressInitialized {
-		address = family.address.toXML()
+func (family Family) MarshalXML(encoder *xml.Encoder, start xml.StartElement) error {
+	familyStart := xml.StartElement{Name: xml.Name{Local: "family"}}
+	if error := encoder.EncodeToken(familyStart); error != nil {
+		return error
 	}
 
-	phone := ""
+	if family.Name != "" {
+		if error := encoder.EncodeElement(family.Name, xml.StartElement{Name: xml.Name{Local: "name"}}); error != nil {
+			return error
+		}
+	}
+
+	if family.Birthyear != "" {
+		if error := encoder.EncodeElement(family.Birthyear, xml.StartElement{Name: xml.Name{Local: "born"}}); error != nil {
+			return error
+		}
+	}
+
 	if family.phoneInitialized {
-		phone = family.phone.toXML()
+		if error := encoder.EncodeElement(family.Phone, xml.StartElement{Name: xml.Name{Local: "phone"}}); error != nil {
+			return error
+		}
 	}
 
-	return fmt.Sprintf("<family><name>%s</name><born>%s</born>%s%s</family>",
-		family.name, family.birthyear, address, phone)
+	if family.addressInitialized {
+		if error := encoder.EncodeElement(family.Address, xml.StartElement{Name: xml.Name{Local: "address"}}); error != nil {
+			return error
+		}
+	}
+
+	if error := encoder.EncodeToken(familyStart.End()); error != nil {
+		return error
+	}
+
+	return nil
 }
 
 func parseFamily(splitLines [][]string) Family {
@@ -31,13 +55,13 @@ func parseFamily(splitLines [][]string) Family {
 
 	for _, splitLine := range splitLines {
 		if splitLine[0] == "F" {
-			family.name = splitLine[1]
-			family.birthyear = splitLine[2]
+			family.Name = splitLine[1]
+			family.Birthyear = splitLine[2]
 		} else if splitLine[0] == "T" {
-			family.phone = parsePhone(splitLine)
+			family.Phone = parsePhone(splitLine)
 			family.phoneInitialized = true
 		} else if splitLine[0] == "A" {
-			family.address = parseAddress(splitLine)
+			family.Address = parseAddress(splitLine)
 			family.addressInitialized = true
 		}
 	}

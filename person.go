@@ -1,35 +1,60 @@
 package main
 
-import "fmt"
+import (
+	"encoding/xml"
+)
 
 type Person struct {
-	firstName          string
-	lastName           string
-	phone              Phone
+	FirstName          string
+	LastName           string
+	Phone              Phone
 	phoneInitialized   bool
-	address            Address
+	Address            Address
 	addressInitialized bool
-	family             []Family
+	Family             []Family
 }
 
-func (person Person) toXML() string {
-	phone := ""
+func (person Person) MarshalXML(encoder *xml.Encoder, start xml.StartElement) error {
+	personStart := xml.StartElement{Name: xml.Name{Local: "person"}}
+	if error := encoder.EncodeToken(personStart); error != nil {
+		return error
+	}
+
+	if person.FirstName != "" {
+		if error := encoder.EncodeElement(person.FirstName, xml.StartElement{Name: xml.Name{Local: "firstname"}}); error != nil {
+			return error
+		}
+	}
+
+	if person.LastName != "" {
+		if error := encoder.EncodeElement(person.LastName, xml.StartElement{Name: xml.Name{Local: "lastname"}}); error != nil {
+			return error
+		}
+	}
+
 	if person.phoneInitialized {
-		phone = person.phone.toXML()
+		if error := encoder.EncodeElement(person.Phone, xml.StartElement{Name: xml.Name{Local: "phone"}}); error != nil {
+			return error
+		}
 	}
 
-	address := ""
 	if person.addressInitialized {
-		address = person.address.toXML()
+		if error := encoder.EncodeElement(person.Address, xml.StartElement{Name: xml.Name{Local: "address"}}); error != nil {
+			return error
+		}
 	}
 
-	family := ""
-	for _, familyMember := range person.family {
-		family += familyMember.toXML()
+	if len(person.Family) > 0 {
+		if error := encoder.EncodeElement(person.Family, xml.StartElement{Name: xml.Name{Local: "family"}}); error != nil {
+			return error
+		}
 	}
 
-	return fmt.Sprintf("<person><firstname>%s</firstname><lastname>%s</lastname>%s%s%s</person>",
-		person.firstName, person.lastName, phone, address, family)
+	if error := encoder.EncodeToken(personStart.End()); error != nil {
+		return error
+	}
+
+	return nil
 }
 
 func parsePerson(splitLines [][]string) Person {
@@ -38,17 +63,17 @@ func parsePerson(splitLines [][]string) Person {
 	for i := 0; i < len(splitLines); i++ {
 		splitLine := splitLines[i]
 		if splitLine[0] == "P" {
-			person.firstName = splitLine[1]
-			person.lastName = splitLine[2]
+			person.FirstName = splitLine[1]
+			person.LastName = splitLine[2]
 		} else if splitLine[0] == "T" {
-			person.phone = parsePhone(splitLine)
+			person.Phone = parsePhone(splitLine)
 			person.phoneInitialized = true
 		} else if splitLine[0] == "A" {
-			person.address = parseAddress(splitLine)
+			person.Address = parseAddress(splitLine)
 			person.addressInitialized = true
 		} else if splitLine[0] == "F" {
 			familyLines, stoppedAtIndex := getUnitLines(i, splitLines, familyValidation)
-			person.family = append(person.family, parseFamily(familyLines))
+			person.Family = append(person.Family, parseFamily(familyLines))
 			i = stoppedAtIndex
 		}
 	}

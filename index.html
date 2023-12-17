@@ -3,8 +3,9 @@
 	<head>
 		<title>{{.Title}}</title>
 		{{ if not .DarkModeOff }}
-		    <link rel="stylesheet" href="/static/styles.css">
+		    <link rel="stylesheet" href="/static/darkmode.css">
 		{{ end }}
+		<link rel="stylesheet" href="/static/defaultstyles.css">
 	</head>
 	<body>
 		<h1>{{.Title}}</h1>
@@ -14,13 +15,19 @@
 			<input type="file" name="file" />
 			<input type="submit" value="Upload" />
 		</form>
-		{{ if .UploadedFileContent }}
-			<h2>File Content:</h2>
-			<pre>{{ html .UploadedFileContent }}</pre>
-		{{ end }}
-		{{ if .FileContentInXML }}
-			<h2>In XML:</h2>
-			<pre>{{ html .FileContentInXML }}</pre>
-		{{ end }}
+		<div class="container">
+			<div class="box" id="box1">
+				{{ if .UploadedFileContent }}
+					<h2>File Content:</h2>
+					<pre>{{ html .UploadedFileContent }}</pre>
+				{{ end }}
+			</div>
+			<div class="box" id="box2">
+				{{ if .FileContentInXML }}
+					<h2>In XML:</h2>
+					<pre>{{ html .FileContentInXML }}</pre>
+				{{ end }}
+			</div>
+		</div>
 	</body>
 	</html>

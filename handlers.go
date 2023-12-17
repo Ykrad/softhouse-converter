@@ -135,23 +135,10 @@ func parsePerson(splitLines [][]string) Person {
 			person.firstName = splitLine[1]
 			person.lastName = splitLine[2]
 		} else if splitLine[0] == "T" {
-			phone := Phone{
-				mobile:   splitLine[1],
-				landline: splitLine[2],
-			}
-			person.phone = phone
+			person.phone = parsePhone(splitLine)
 			person.phoneInitialized = true
 		} else if splitLine[0] == "A" {
-			address := Address{
-				street: splitLine[1],
-				city:   splitLine[2],
-			}
-
-			if len(splitLine) == 4 {
-				address.areaCode = splitLine[3]
-			}
-
-			person.address = address
+			person.address = parseAddress(splitLine)
 			person.addressInitialized = true
 		} else if splitLine[0] == "F" {
 			familyLines, stoppedAtIndex := getUnitLines(i, splitLines, familyValidation)
@@ -163,6 +150,27 @@ func parsePerson(splitLines [][]string) Person {
 	return person
 }
 
+func parsePhone(splitLine []string) Phone {
+	phone := Phone{
+		mobile:   splitLine[1],
+		landline: splitLine[2],
+	}
+	return phone
+}
+
+func parseAddress(splitLine []string) Address {
+	address := Address{
+		street: splitLine[1],
+		city:   splitLine[2],
+	}
+
+	if len(splitLine) == 4 {
+		address.areaCode = splitLine[3]
+	}
+
+	return address
+}
+
 func parseFamily(splitLines [][]string) Family {
 	family := Family{}
 
@@ -171,23 +179,10 @@ func parseFamily(splitLines [][]string) Family {
 			family.name = splitLine[1]
 			family.birthyear = splitLine[2]
 		} else if splitLine[0] == "T" {
-			phone := Phone{
-				mobile:   splitLine[1],
-				landline: splitLine[2],
-			}
-			family.phone = phone
+			family.phone = parsePhone(splitLine)
 			family.phoneInitialized = true
 		} else if splitLine[0] == "A" {
-			address := Address{
-				street: splitLine[1],
-				city:   splitLine[2],
-			}
-
-			if len(splitLine) == 4 {
-				address.areaCode = splitLine[3]
-			}
-
-			family.address = address
+			family.address = parseAddress(splitLine)
 			family.addressInitialized = true
 		}
 	}
